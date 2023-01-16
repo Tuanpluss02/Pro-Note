@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.stormx.pro_note">
    <application
-        android:label="pro_note"
+        android:label="Pro Notes"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
