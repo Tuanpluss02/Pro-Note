@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:pro_note/models/note_card.dart';
 import 'package:pro_note/pages/edit_note.dart';
 import 'package:pro_note/styles/app_style.dart';
@@ -27,11 +26,11 @@ class _MyHomePageState extends State<MyHomePage> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Your Notes',
-              style: GoogleFonts.roboto(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white)),
+          // Text('Your Notes',
+          //     style: GoogleFonts.roboto(
+          //         fontSize: 22,
+          //         fontWeight: FontWeight.bold,
+          //         color: Colors.white)),
           const SizedBox(height: 20),
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
@@ -51,11 +50,12 @@ class _MyHomePageState extends State<MyHomePage> {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => EditNote(
-                                              docs: docs,
-                                              isUpdate: true,
-                                            )));
-                              }, docs))
+                                      builder: (context) => EditNote(
+                                        docs: docs,
+                                        isUpdate: true,
+                                      ),
+                                    ));
+                              }, docs, context))
                           .toList());
                 }
                 return const Center(child: Text('No data'));

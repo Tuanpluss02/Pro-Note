@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:pro_note/pages/home_page.dart';
 
 Future<void> main() async {
@@ -13,7 +14,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // to hide only bottom bar:
+    // SystemChrome.setEnabledSystemUIOverlays ([SystemUiOverlay.top]);
+
+    // to hide only status bar:
+    // SystemChrome.setEnabledSystemUIOverlays ([SystemUiOverlay.bottom]);
+
+    // to hide both:
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Pro Notes',
       theme: ThemeData(
         primarySwatch: Colors.blue,

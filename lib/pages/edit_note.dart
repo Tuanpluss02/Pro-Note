@@ -21,6 +21,9 @@ class _EditNoteState extends State<EditNote> {
       widget.isUpdate ? widget.docs!['content'] : '';
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
+  bool _isEditing = false;
+  final String _dateNote =
+      '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}';
   @override
   void initState() {
     super.initState();
@@ -66,8 +69,7 @@ class _EditNoteState extends State<EditNote> {
                             'title': _titleController.text,
                             'content': _contentController.text,
                             // 'date': DateTime.now().toString(),
-                            'date':
-                                '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
+                            'date': _dateNote,
                             'color': _ranColor,
                           });
                     Navigator.pop(context);
@@ -93,6 +95,9 @@ class _EditNoteState extends State<EditNote> {
               ? AppStyle.cardsColors[widget.docs!['color'] ?? _ranColor]
               : AppStyle.cardsColors[_ranColor],
           appBar: AppBar(
+            iconTheme: const IconThemeData(
+              color: Colors.black, //change your color here
+            ),
             title: Text(widget.isUpdate ? 'Edit Note' : 'Add new note',
                 style: AppStyle.mainTitle),
             backgroundColor: widget.isUpdate
@@ -103,12 +108,17 @@ class _EditNoteState extends State<EditNote> {
           ),
           body: Column(children: [
             TextField(
+              onChanged: (p) {
+                setState(() {
+                  _isEditing = true;
+                });
+              },
               textAlign: TextAlign.center,
               controller: _titleController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 border: InputBorder.none,
                 hintText: 'Enter title',
-                hintStyle: AppStyle.mainTitle,
+                // hintStyle: AppStyle.mainTitle,
               ),
               style: AppStyle.mainTitle,
             ),
@@ -116,9 +126,7 @@ class _EditNoteState extends State<EditNote> {
                 padding: const EdgeInsets.all(8),
                 margin: const EdgeInsets.all(8),
                 child: AutoSizeText(
-                  widget.docs != null
-                      ? widget.docs!['date']
-                      : DateTime.now().toString(),
+                  widget.docs != null ? widget.docs!['date'] : _dateNote,
                   style: AppStyle.dateTitle,
                   maxLines: 1,
                 )),
@@ -126,6 +134,11 @@ class _EditNoteState extends State<EditNote> {
                 padding: const EdgeInsets.all(8),
                 margin: const EdgeInsets.all(8),
                 child: TextField(
+                  onChanged: (p) {
+                    setState(() {
+                      _isEditing = true;
+                    });
+                  },
                   controller: _contentController,
                   decoration: InputDecoration(
                     border: InputBorder.none,
@@ -135,16 +148,25 @@ class _EditNoteState extends State<EditNote> {
                   maxLines: 8,
                 ))
           ]),
-          floatingActionButton: _isChanged()
+          floatingActionButton: _isEditing
               ? FloatingActionButton(
                   onPressed: () {
-                    FirebaseFirestore.instance
-                        .collection('notes')
-                        .doc(widget.docs!.id)
-                        .update({
-                      'title': _titleController.text,
-                      'content': _contentController.text,
-                    });
+                    widget.isUpdate
+                        ? FirebaseFirestore.instance
+                            .collection('Notes')
+                            .doc(widget.docs!.id)
+                            .update({
+                            'title': _titleController.text,
+                            'content': _contentController.text,
+                          })
+                        : FirebaseFirestore.instance.collection('Notes').add({
+                            'title': _titleController.text,
+                            'content': _contentController.text,
+                            // 'date': DateTime.now().toString(),
+                            'date':
+                                '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
+                            'color': _ranColor,
+                          });
                     Navigator.pop(context);
                   },
                   child: const Icon(Icons.save),

@@ -1,11 +1,15 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:pro_note/styles/app_style.dart';
 
-Widget noteCard(Function()? onTap, QueryDocumentSnapshot docs) {
+Widget noteCard(
+    Function()? onTap, QueryDocumentSnapshot docs, BuildContext context) {
   return InkWell(
     onTap: onTap,
+    onLongPress: () => showDialog(
+      context: context,
+      builder: (context) => alertDel(context, docs),
+    ),
     child: Container(
       padding: const EdgeInsets.all(8),
       margin: const EdgeInsets.all(8),
@@ -14,14 +18,40 @@ Widget noteCard(Function()? onTap, QueryDocumentSnapshot docs) {
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(children: [
-        AutoSizeText(docs['title'], style: AppStyle.mainTitle),
+        Text(docs['title'],
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: AppStyle.mainTitle),
         Text(docs['date'], style: AppStyle.dateTitle),
-        AutoSizeText(
+        Text(
           docs['content'],
+          overflow: TextOverflow.ellipsis,
+          maxLines: 10,
           style: AppStyle.mainContent,
-          maxLines: 8,
+          // maxLines: 8,
         )
       ]),
     ),
+  );
+}
+
+Widget alertDel(BuildContext context, QueryDocumentSnapshot docs) {
+  return AlertDialog(
+    title: const Text('Are you sure?'),
+    content: const Text('This note will be deleted permanently.'),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.pop(context),
+        child: const Text('Cancel'),
+      ),
+      TextButton(
+        onPressed: () {
+          FirebaseFirestore.instance.collection('Notes').doc(docs.id).delete();
+          Navigator.pop(context);
+        },
+        child: const Text('Delete'),
+      ),
+    ],
   );
 }
