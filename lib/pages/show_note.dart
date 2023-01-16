@@ -12,6 +12,8 @@ class NoteShow extends StatefulWidget {
 
 class _NoteShowState extends State<NoteShow> {
   late final int _color = widget.docs['color'];
+  // get document id
+  late final String _id = widget.docs.id;
   @override
   Widget build(BuildContext context) {
     return Scaffold(

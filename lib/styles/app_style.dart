@@ -26,8 +26,8 @@ class AppStyle {
     color: mainColor,
   );
   static TextStyle dateTitle = GoogleFonts.roboto(
-    fontSize: 19,
+    fontSize: 16,
     color: mainColor,
-    fontWeight: FontWeight.w500,
+    fontStyle: FontStyle.italic,
   );
 }

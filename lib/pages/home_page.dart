@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pro_note/models/note_card.dart';
-import 'package:pro_note/pages/show_note.dart';
+import 'package:pro_note/pages/edit_note.dart';
 import 'package:pro_note/styles/app_style.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -51,8 +51,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) =>
-                                            NoteShow(docs: docs)));
+                                        builder: (context) => EditNote(
+                                              docs: docs,
+                                              isUpdate: true,
+                                            )));
                               }, docs))
                           .toList());
                 }
@@ -63,7 +65,14 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const EditNote(
+                        isUpdate: false,
+                      )));
+        },
         label: const Text('Add Note'),
         icon: const Icon(Icons.add),
       ),
