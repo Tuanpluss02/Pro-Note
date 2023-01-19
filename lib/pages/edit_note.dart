@@ -153,9 +153,10 @@ class _EditNoteState extends State<EditNote> {
                   },
                   controller: _contentController,
                   decoration: InputDecoration(
-                    border: InputBorder.none,
-                    hintStyle: AppStyle.mainContent,
-                  ),
+                      border: InputBorder.none,
+                      hintStyle: AppStyle.mainContent,
+                      hintText: 'Enter your note',
+                      alignLabelWithHint: true),
                   style: AppStyle.mainContent,
                   maxLines: 8,
                 ))

@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:pro_note/models/user.dart';
 import 'package:pro_note/models/validator.dart';
 import 'package:pro_note/pages/home_page.dart';
+import 'package:pro_note/services/data_store.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
@@ -18,14 +19,9 @@ class SignUp extends StatefulWidget {
 
 class _SignUpState extends State<SignUp> {
   // ignore: prefer_final_fields
-  UserInformation _user = UserInformation(
-    userId: '',
-    username: '',
-    email: '',
-    password: '',
-    profilePicture: '',
-  );
-
+  UserInformation _user =
+      UserInformation(userId: '', email: '', profilePicture: '', username: '');
+  String password = '';
   var isLoading = false;
   File? _image;
   final _formKey = GlobalKey<FormState>();
@@ -59,7 +55,7 @@ class _SignUpState extends State<SignUp> {
     UserCredential userCredential =
         await FirebaseAuth.instance.createUserWithEmailAndPassword(
       email: _user.email,
-      password: _user.password,
+      password: password,
     );
 
     _user.userId = userCredential.user!.uid;
@@ -84,6 +80,8 @@ class _SignUpState extends State<SignUp> {
       'email': _user.email,
       'profilePicture': _user.profilePicture,
     });
+    await saveDataToLocal(_user);
+    await markUserSignedIn();
     onSuccess.call();
   }
 
@@ -168,7 +166,7 @@ class _SignUpState extends State<SignUp> {
                         },
                         onSaved: (val) {
                           setState(() {
-                            _user.password = val!;
+                            password = val!;
                           });
                         },
                         autocorrect: false,

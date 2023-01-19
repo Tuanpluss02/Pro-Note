@@ -49,7 +49,7 @@ Widget alertDel(
       TextButton(
         onPressed: () {
           FirebaseFirestore.instance
-              .collection('Notes')
+              .collection('Users')
               .doc(userId)
               .collection('UserNotes')
               .doc(docs.id)
