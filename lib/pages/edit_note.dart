@@ -6,9 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:pro_note/styles/app_style.dart';
 
 class EditNote extends StatefulWidget {
+  // ignore: prefer_typing_uninitialized_variables
+  final userId;
   final bool isUpdate;
   final QueryDocumentSnapshot? docs;
-  const EditNote({super.key, this.docs, required this.isUpdate});
+  const EditNote(
+      {super.key, this.docs, required this.isUpdate, required this.userId});
 
   @override
   State<EditNote> createState() => _EditNoteState();
@@ -37,7 +40,7 @@ class _EditNoteState extends State<EditNote> {
   }
 
   Future<bool> _requestPop() {
-    _isChanged()
+    (_isChanged() && _isEditing)
         ? showDialog(
             context: context,
             builder: (context) => AlertDialog(
@@ -59,19 +62,28 @@ class _EditNoteState extends State<EditNote> {
                   onPressed: () {
                     widget.isUpdate
                         ? FirebaseFirestore.instance
-                            .collection('Notes')
+                            .collection('Users')
+                            .doc(widget.userId)
+                            .collection('UserNotes')
                             .doc(widget.docs!.id)
                             .update({
                             'title': _titleController.text,
                             'content': _contentController.text,
                           })
-                        : FirebaseFirestore.instance.collection('Notes').add({
+                        : FirebaseFirestore.instance
+                            .collection('Users')
+                            .doc(widget.userId)
+                            .collection('UserNotes')
+                            .add({
                             'title': _titleController.text,
                             'content': _contentController.text,
-                            // 'date': DateTime.now().toString(),
-                            'date': _dateNote,
+                            'date':
+                                '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
                             'color': _ranColor,
                           });
+                    setState(() {
+                      _isEditing = false;
+                    });
                     Navigator.pop(context);
                     Navigator.pop(context);
                   },
@@ -153,21 +165,28 @@ class _EditNoteState extends State<EditNote> {
                   onPressed: () {
                     widget.isUpdate
                         ? FirebaseFirestore.instance
-                            .collection('Notes')
+                            .collection('Users')
+                            .doc(widget.userId)
+                            .collection('UserNotes')
                             .doc(widget.docs!.id)
                             .update({
                             'title': _titleController.text,
                             'content': _contentController.text,
                           })
-                        : FirebaseFirestore.instance.collection('Notes').add({
+                        : FirebaseFirestore.instance
+                            .collection('Users')
+                            .doc(widget.userId)
+                            .collection('UserNotes')
+                            .add({
                             'title': _titleController.text,
                             'content': _contentController.text,
-                            // 'date': DateTime.now().toString(),
                             'date':
                                 '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
                             'color': _ranColor,
                           });
-                    Navigator.pop(context);
+                    setState(() {
+                      _isEditing = false;
+                    });
                   },
                   child: const Icon(Icons.save),
                 )

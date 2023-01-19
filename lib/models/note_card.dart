@@ -2,13 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:pro_note/styles/app_style.dart';
 
-Widget noteCard(
-    Function()? onTap, QueryDocumentSnapshot docs, BuildContext context) {
+Widget noteCard(Function()? onTap, QueryDocumentSnapshot docs,
+    BuildContext context, String userId) {
   return InkWell(
     onTap: onTap,
     onLongPress: () => showDialog(
       context: context,
-      builder: (context) => alertDel(context, docs),
+      builder: (context) => alertDel(context, docs, userId),
     ),
     child: Container(
       padding: const EdgeInsets.all(8),
@@ -36,7 +36,8 @@ Widget noteCard(
   );
 }
 
-Widget alertDel(BuildContext context, QueryDocumentSnapshot docs) {
+Widget alertDel(
+    BuildContext context, QueryDocumentSnapshot docs, String userId) {
   return AlertDialog(
     title: const Text('Are you sure?'),
     content: const Text('This note will be deleted permanently.'),
@@ -47,7 +48,12 @@ Widget alertDel(BuildContext context, QueryDocumentSnapshot docs) {
       ),
       TextButton(
         onPressed: () {
-          FirebaseFirestore.instance.collection('Notes').doc(docs.id).delete();
+          FirebaseFirestore.instance
+              .collection('Notes')
+              .doc(userId)
+              .collection('UserNotes')
+              .doc(docs.id)
+              .delete();
           Navigator.pop(context);
         },
         child: const Text('Delete'),
