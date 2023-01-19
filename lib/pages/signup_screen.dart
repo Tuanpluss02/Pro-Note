@@ -77,7 +77,8 @@ class _SignUpState extends State<SignUp> {
         .collection('Users')
         .doc(userCredential.user!.uid)
         .collection('UserInformation')
-        .add({
+        .doc(userCredential.user!.uid)
+        .set({
       'userId': _user.userId,
       'username': _user.username,
       'email': _user.email,
@@ -210,7 +211,7 @@ class _SignUpState extends State<SignUp> {
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) => MyHomePage(
-                                                userId: _user.userId,
+                                                user: _user,
                                               )),
                                       (route) => false);
                                 }),

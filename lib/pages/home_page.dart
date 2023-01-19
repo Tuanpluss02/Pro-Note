@@ -1,12 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:pro_note/models/note_card.dart';
+import 'package:pro_note/models/user.dart';
 import 'package:pro_note/pages/edit_note.dart';
 import 'package:pro_note/styles/app_style.dart';
 
 class MyHomePage extends StatefulWidget {
-  final String userId;
-  const MyHomePage({super.key, required this.userId});
+  final UserInformation user;
+  const MyHomePage({super.key, required this.user});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -34,7 +35,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   // FirebaseFirestore.instance.collection('Notes').snapshots(),
                   FirebaseFirestore.instance
                       .collection('Users')
-                      .doc(widget.userId)
+                      .doc(widget.user.userId)
                       .collection('UserNotes')
                       .snapshots(),
               builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -52,12 +53,12 @@ class _MyHomePageState extends State<MyHomePage> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => EditNote(
-                                        userId: widget.userId,
+                                        userId: widget.user.userId,
                                         docs: docs,
                                         isUpdate: true,
                                       ),
                                     ));
-                              }, docs, context, widget.userId))
+                              }, docs, context, widget.user.userId))
                           .toList());
                 }
                 return const Center(child: Text('No data'));
@@ -105,7 +106,7 @@ class _MyHomePageState extends State<MyHomePage> {
               context,
               MaterialPageRoute(
                   builder: (context) => EditNote(
-                        userId: widget.userId,
+                        userId: widget.user.userId,
                         isUpdate: false,
                       )));
         },

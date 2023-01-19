@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:pro_note/models/user.dart';
 import 'package:pro_note/models/validator.dart';
 import 'package:pro_note/pages/home_page.dart';
 
@@ -57,14 +59,18 @@ class _SignInState extends State<SignIn> {
                 ));
       } else {
         User? currentUser = FirebaseAuth.instance.currentUser;
-        if (currentUser != null) {
-          Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => MyHomePage(
-                        userId: currentUser.uid,
-                      )));
-        }
+        UserInformation user = FirebaseFirestore.instance
+            .collection('Users')
+            .doc(currentUser!.uid)
+            .collection('UserInformation')
+            .doc(currentUser.uid)
+            .get() as UserInformation;
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => MyHomePage(
+                      user: user,
+                    )));
       }
     }
   }
@@ -90,7 +96,6 @@ class _SignInState extends State<SignIn> {
                           if (!emailValidator(value)) {
                             return 'Please enter a valid email';
                           }
-
                           return null;
                         },
                         onSaved: (val) {
