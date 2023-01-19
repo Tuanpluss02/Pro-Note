@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pro_note/models/user.dart';
@@ -60,27 +61,28 @@ class _SignUpState extends State<SignUp> {
       email: _user.email,
       password: _user.password,
     );
-    _user.userId = userCredential.user!.uid;
-    // Reference ref = FirebaseStorage.instance
-    //     .ref()
-    //     .child('user_image')
-    //     .child('${userCredential.user!.uid}.jpg');
 
-    // UploadTask uploadTask = ref.putFile(_image!);
-    // final snapshot = await uploadTask.whenComplete(() => null);
-    // _user.profilePicture = await snapshot.ref.getDownloadURL();
+    _user.userId = userCredential.user!.uid;
+
+    Reference ref = FirebaseStorage.instance
+        .ref()
+        .child('user_image')
+        .child('${userCredential.user!.uid}.jpg');
+
+    UploadTask uploadTask = ref.putFile(_image!);
+    final snapshot = await uploadTask.whenComplete(() => null);
+    _user.profilePicture = await snapshot.ref.getDownloadURL();
 
     await FirebaseFirestore.instance
         .collection('Users')
         .doc(userCredential.user!.uid)
-        .collection('UserNotes')
+        .collection('UserInformation')
         .add({
       'userId': _user.userId,
       'username': _user.username,
       'email': _user.email,
-      // 'profilePicture': _user.profilePicture,
+      'profilePicture': _user.profilePicture,
     });
-
     onSuccess.call();
   }
 
