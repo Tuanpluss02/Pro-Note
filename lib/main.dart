@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:pro_note/models/user.dart';
 import 'package:pro_note/pages/home_page.dart';
 import 'package:pro_note/pages/signin_creen.dart';
-import 'package:pro_note/pages/signup_screen.dart';
 import 'package:pro_note/services/data_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -55,7 +54,7 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      // home: const MyHomePage(),
+      // home: const (),
       home: currentScreen,
     );
   }

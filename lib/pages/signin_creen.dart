@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:pro_note/models/user.dart';
 import 'package:pro_note/models/validator.dart';
+import 'package:pro_note/pages/home_page.dart';
 import 'package:pro_note/pages/signup_screen.dart';
 
 class SignIn extends StatefulWidget {
@@ -12,7 +14,7 @@ class SignIn extends StatefulWidget {
 }
 
 class _SignInState extends State<SignIn> {
-  // late UserInformation _user;
+  late UserInformation user;
   late String _email;
   late String _password;
   final _formKey = GlobalKey<FormState>();
@@ -35,38 +37,38 @@ class _SignInState extends State<SignIn> {
   //       password: _password,
   //     );
   //   } on FirebaseAuthException catch (e) {
-  //     if (e.code == 'user-not-found') {
-  //       setState(() {
-  //         isLoading = false;
-  //       });
+  // if (e.code == 'user-not-found') {
+  //   setState(() {
+  //     isLoading = false;
+  //   });
 
-  //       showDialog(
-  //           context: context,
-  //           builder: (context) => AlertDialog(
-  //                 title: const Text('Error'),
-  //                 content: const Text('No user found for that email.'),
-  //                 actions: [
-  //                   TextButton(
-  //                       onPressed: () => Navigator.of(context).pop(),
-  //                       child: const Text('Ok'))
-  //                 ],
-  //               ));
-  //     } else if (e.code == 'wrong-password') {
-  //       setState(() {
-  //         isLoading = false;
-  //       });
-  //       showDialog(
-  //           context: context,
-  //           builder: (context) => AlertDialog(
-  //                 title: const Text('Error'),
-  //                 content: const Text('Wrong password provided for that user.'),
-  //                 actions: [
-  //                   TextButton(
-  //                       onPressed: () => Navigator.of(context).pop(),
-  //                       child: const Text('Ok'))
-  //                 ],
-  //               ));
-  //     } else {
+  //   showDialog(
+  //       context: context,
+  //       builder: (context) => AlertDialog(
+  //             title: const Text('Error'),
+  //             content: const Text('No user found for that email.'),
+  //             actions: [
+  //               TextButton(
+  //                   onPressed: () => Navigator.of(context).pop(),
+  //                   child: const Text('Ok'))
+  //             ],
+  //           ));
+  // } else if (e.code == 'wrong-password') {
+  //   setState(() {
+  //     isLoading = false;
+  //   });
+  //   showDialog(
+  //       context: context,
+  //       builder: (context) => AlertDialog(
+  //             title: const Text('Error'),
+  //             content: const Text('Wrong password provided for that user.'),
+  //             actions: [
+  //               TextButton(
+  //                   onPressed: () => Navigator.of(context).pop(),
+  //                   child: const Text('Ok'))
+  //             ],
+  //           ));
+  // } else {
   // User? currentUser = FirebaseAuth.instance.currentUser;
 
   // final docRef = FirebaseFirestore.instance
@@ -95,7 +97,7 @@ class _SignInState extends State<SignIn> {
   //   }
   // }
 
-  void signIn() async {
+  void signIn(VoidCallback navigator) async {
     final isValid = _formKey.currentState!.validate();
     if (!isValid) {
       return;
@@ -105,29 +107,63 @@ class _SignInState extends State<SignIn> {
     setState(() {
       isLoading = true;
     });
-
+    // try {
     await FirebaseAuth.instance.signInWithEmailAndPassword(
       email: _email,
       password: _password,
     );
+    // } on FirebaseAuthException catch (e) {
+    //   if (e.code == 'user-not-found') {
+    //     setState(() {
+    //       isLoading = false;
+    //     });
+    //     showDialog(
+    //         context: context,
+    //         builder: (context) => AlertDialog(
+    //               title: const Text('Error'),
+    //               content: const Text('No user found for that email.'),
+    //               actions: [
+    //                 TextButton(
+    //                     onPressed: () => Navigator.of(context).pop(),
+    //                     child: const Text('Ok'))
+    //               ],
+    //             ));
+    //   } else if (e.code == 'wrong-password') {
+    //     setState(() {
+    //       isLoading = false;
+    //     });
+    //     showDialog(
+    //         context: context,
+    //         builder: (context) => AlertDialog(
+    //               title: const Text('Error'),
+    //               content: const Text('Wrong password provided for that user.'),
+    //               actions: [
+    //                 TextButton(
+    //                     onPressed: () => Navigator.of(context).pop(),
+    //                     child: const Text('Ok'))
+    //               ],
+    //             ));
+    //   } else {
     User? currentUser = FirebaseAuth.instance.currentUser;
 
-    final docRef = FirebaseFirestore.instance
+    await FirebaseFirestore.instance
         .collection('Users')
         .doc(currentUser!.uid)
         .collection('UserInformation')
-        .doc(currentUser.uid);
-    // docRef.get().then((DocumentSnapshot doc) {
-    //   final data = doc.data() as Map<String, dynamic>;
-    //   _user = UserInformation(
-    //       userId: data['userId'],
-    //       email: data['email'],
-    //       username: data['username'],
-    //       profilePicture: data['profilePicture']);
-    // });
-    print(docRef);
-    Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => const SignUp()));
+        .doc(currentUser.uid)
+        .get()
+        .then((DocumentSnapshot doc) {
+      final data = doc.data() as Map<String, dynamic>;
+      setState(() {
+        user = UserInformation.fromJson(data);
+      });
+    }, onError: (e) {
+      var snackBar = SnackBar(content: Text(e.toString()));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    });
+    navigator.call();
+
+    // }
   }
 
   @override
@@ -203,7 +239,12 @@ class _SignInState extends State<SignIn> {
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(20)),
                               child: ElevatedButton(
-                                onPressed: signIn,
+                                onPressed: () => signIn(() =>
+                                    Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                MyHomePage(user: user)))),
                                 child: const Text('Sign In'),
                               ),
                             ),

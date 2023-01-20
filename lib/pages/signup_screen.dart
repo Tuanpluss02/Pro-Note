@@ -54,7 +54,7 @@ class _SignUpState extends State<SignUp> {
 
     UserCredential userCredential =
         await FirebaseAuth.instance.createUserWithEmailAndPassword(
-      email: _user.email,
+      email: _user.email!,
       password: password,
     );
 

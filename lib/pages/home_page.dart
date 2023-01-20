@@ -14,11 +14,34 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  late Stream<QuerySnapshot<Map<String, dynamic>>> snapshots;
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      snapshots = FirebaseFirestore.instance
+          .collection('Users')
+          .doc(widget.user.userId)
+          .collection('UserNotes')
+          .snapshots();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppStyle.mainColor,
       appBar: AppBar(
+        leading: Builder(builder: (context) {
+          return TextButton(
+            // onPressed: () => Scaffold.of(context).openDrawer(),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+            child: CircleAvatar(
+                radius: 20,
+                backgroundImage: NetworkImage(widget.user.profilePicture!)),
+          );
+        }),
         elevation: 0,
         centerTitle: true,
         backgroundColor: AppStyle.mainColor,
@@ -31,13 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
           const SizedBox(height: 20),
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
-              stream:
-                  // FirebaseFirestore.instance.collection('Notes').snapshots(),
-                  FirebaseFirestore.instance
-                      .collection('Users')
-                      .doc(widget.user.userId)
-                      .collection('UserNotes')
-                      .snapshots(),
+              stream: snapshots,
               builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
@@ -58,7 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                         isUpdate: true,
                                       ),
                                     ));
-                              }, docs, context, widget.user.userId))
+                              }, docs, context, widget.user.userId!))
                           .toList());
                 }
                 return const Center(child: Text('No data'));

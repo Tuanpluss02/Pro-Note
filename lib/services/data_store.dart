@@ -3,9 +3,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> saveDataToLocal(UserInformation user) async {
   final prefs = await SharedPreferences.getInstance();
-  await prefs.setString('userId', user.userId);
-  await prefs.setString('email', user.email);
-  await prefs.setString('username', user.username);
+  await prefs.setString('userId', user.userId!);
+  await prefs.setString('email', user.email!);
+  await prefs.setString('username', user.username!);
   await prefs.setString('profilePicture', user.profilePicture!);
 }
 
