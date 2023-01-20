@@ -98,6 +98,7 @@ class _SignInState extends State<SignIn> {
   // }
 
   void signIn(VoidCallback navigator) async {
+    bool isSignInSuccess = false;
     final isValid = _formKey.currentState!.validate();
     if (!isValid) {
       return;
@@ -107,63 +108,70 @@ class _SignInState extends State<SignIn> {
     setState(() {
       isLoading = true;
     });
-    // try {
-    await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: _email,
-      password: _password,
-    );
-    // } on FirebaseAuthException catch (e) {
-    //   if (e.code == 'user-not-found') {
-    //     setState(() {
-    //       isLoading = false;
-    //     });
-    //     showDialog(
-    //         context: context,
-    //         builder: (context) => AlertDialog(
-    //               title: const Text('Error'),
-    //               content: const Text('No user found for that email.'),
-    //               actions: [
-    //                 TextButton(
-    //                     onPressed: () => Navigator.of(context).pop(),
-    //                     child: const Text('Ok'))
-    //               ],
-    //             ));
-    //   } else if (e.code == 'wrong-password') {
-    //     setState(() {
-    //       isLoading = false;
-    //     });
-    //     showDialog(
-    //         context: context,
-    //         builder: (context) => AlertDialog(
-    //               title: const Text('Error'),
-    //               content: const Text('Wrong password provided for that user.'),
-    //               actions: [
-    //                 TextButton(
-    //                     onPressed: () => Navigator.of(context).pop(),
-    //                     child: const Text('Ok'))
-    //               ],
-    //             ));
-    //   } else {
-    User? currentUser = FirebaseAuth.instance.currentUser;
-
-    await FirebaseFirestore.instance
-        .collection('Users')
-        .doc(currentUser!.uid)
-        .collection('UserInformation')
-        .doc(currentUser.uid)
-        .get()
-        .then((DocumentSnapshot doc) {
-      final data = doc.data() as Map<String, dynamic>;
-      setState(() {
-        user = UserInformation.fromJson(data);
+    try {
+      await FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+            email: _email,
+            password: _password,
+          )
+          .then((value) => {
+                if (value != null)
+                  {
+                    isSignInSuccess = true,
+                  }
+              });
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        setState(() {
+          isLoading = false;
+        });
+        showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+                  title: const Text('Error'),
+                  content: const Text('No user found for that email.'),
+                  actions: [
+                    TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: const Text('Ok'))
+                  ],
+                ));
+      } else if (e.code == 'wrong-password') {
+        setState(() {
+          isLoading = false;
+        });
+        showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+                  title: const Text('Error'),
+                  content: const Text('Wrong password provided for that user.'),
+                  actions: [
+                    TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: const Text('Ok'))
+                  ],
+                ));
+      }
+    }
+    if (isSignInSuccess) {
+      User? currentUser = FirebaseAuth.instance.currentUser;
+      await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(currentUser!.uid)
+          .collection('UserInformation')
+          .doc(currentUser.uid)
+          .get()
+          .then((DocumentSnapshot doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        setState(() {
+          user = UserInformation.fromJson(data);
+        });
+      }, onError: (e) {
+        var snackBar = SnackBar(content: Text(e.toString()));
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
       });
-    }, onError: (e) {
-      var snackBar = SnackBar(content: Text(e.toString()));
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    });
-    navigator.call();
-
-    // }
+      navigator.call();
+    }
   }
 
   @override

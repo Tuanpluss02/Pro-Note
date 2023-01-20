@@ -85,38 +85,21 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
       drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
+          child: Center(
+        child: Column(
           children: [
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: AppStyle.mainColor,
-              ),
-              child: const Text(
-                'Pro Notes',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                ),
-              ),
+            CircleAvatar(
+              radius: 50,
+              backgroundImage: NetworkImage(widget.user.profilePicture!),
             ),
-            ListTile(
-              title: const Text('Item 1'),
-              onTap: () {
-                // Update the state of the app.
-                // ...
-              },
-            ),
-            ListTile(
-              title: const Text('Item 2'),
-              onTap: () {
-                // Update the state of the app.
-                // ...
-              },
-            ),
+            const SizedBox(height: 20),
+            Text(widget.user.username!),
+            const SizedBox(height: 20),
+            Text(widget.user.email!),
+            const SizedBox(height: 20),
           ],
         ),
-      ),
+      )),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           Navigator.push(
