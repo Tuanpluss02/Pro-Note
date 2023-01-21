@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:pro_note/models/user.dart';
 import 'package:pro_note/pages/home_page.dart';
 import 'package:pro_note/pages/signin_creen.dart';
-import 'package:pro_note/services/data_store.dart';
+import 'package:pro_note/services/data_modify.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
@@ -59,3 +59,85 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
+
+// import 'package:flutter/material.dart';
+
+// void main() {
+//   runApp(const MaterialApp(home: MyApp()));
+// }
+
+// class MyApp extends StatefulWidget {
+//   const MyApp({super.key});
+
+//   @override
+//   _MyAppState createState() => _MyAppState();
+// }
+
+// class _MyAppState extends State<MyApp> {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text("Flutter"),
+//       ),
+//       body: Center(
+//         child: ElevatedButton(
+//           onPressed: () {
+//             showDialog(
+//                 context: context,
+//                 builder: (BuildContext context) {
+//                   return AlertDialog(
+//                     content: Stack(
+//                       clipBehavior: Clip.none,
+//                       children: [
+//                         Positioned(
+//                           right: -40.0,
+//                           top: -40.0,
+//                           child: InkResponse(
+//                             onTap: () {
+//                               Navigator.of(context).pop();
+//                             },
+//                             child: const CircleAvatar(
+//                               backgroundColor: Colors.red,
+//                               child: Icon(Icons.close),
+//                             ),
+//                           ),
+//                         ),
+//                         Form(
+//                           key: _formKey,
+//                           child: Column(
+//                             mainAxisSize: MainAxisSize.min,
+//                             children: <Widget>[
+//                               Padding(
+//                                 padding: const EdgeInsets.all(8.0),
+//                                 child: TextFormField(),
+//                               ),
+//                               Padding(
+//                                 padding: const EdgeInsets.all(8.0),
+//                                 child: TextFormField(),
+//                               ),
+//                               Padding(
+//                                 padding: const EdgeInsets.all(8.0),
+//                                 child: ElevatedButton(
+//                                   child: const Text("Submitß"),
+//                                   onPressed: () {
+//                                     if (_formKey.currentState!.validate()) {
+//                                       _formKey.currentState!.save();
+//                                     }
+//                                   },
+//                                 ),
+//                               )
+//                             ],
+//                           ),
+//                         ),
+//                       ],
+//                     ),
+//                   );
+//                 });
+//           },
+//           child: const Text("Open Popup"),
+//         ),
+//       ),
+//     );
+//   }
+// }

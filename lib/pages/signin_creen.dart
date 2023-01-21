@@ -2,9 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pro_note/models/user.dart';
-import 'package:pro_note/models/validator.dart';
 import 'package:pro_note/pages/home_page.dart';
 import 'package:pro_note/pages/signup_screen.dart';
+import 'package:pro_note/services/auth_method.dart';
+import 'package:pro_note/services/data_modify.dart';
 
 class SignIn extends StatefulWidget {
   const SignIn({super.key});
@@ -19,83 +20,6 @@ class _SignInState extends State<SignIn> {
   late String _password;
   final _formKey = GlobalKey<FormState>();
   var isLoading = false;
-
-  // void signIn() async {
-  //   final isValid = _formKey.currentState!.validate();
-  //   if (!isValid) {
-  //     return;
-  //   }
-  //   _formKey.currentState!.save();
-
-  //   setState(() {
-  //     isLoading = true;
-  //   });
-
-  //   try {
-  //     await FirebaseAuth.instance.signInWithEmailAndPassword(
-  //       email: _email,
-  //       password: _password,
-  //     );
-  //   } on FirebaseAuthException catch (e) {
-  // if (e.code == 'user-not-found') {
-  //   setState(() {
-  //     isLoading = false;
-  //   });
-
-  //   showDialog(
-  //       context: context,
-  //       builder: (context) => AlertDialog(
-  //             title: const Text('Error'),
-  //             content: const Text('No user found for that email.'),
-  //             actions: [
-  //               TextButton(
-  //                   onPressed: () => Navigator.of(context).pop(),
-  //                   child: const Text('Ok'))
-  //             ],
-  //           ));
-  // } else if (e.code == 'wrong-password') {
-  //   setState(() {
-  //     isLoading = false;
-  //   });
-  //   showDialog(
-  //       context: context,
-  //       builder: (context) => AlertDialog(
-  //             title: const Text('Error'),
-  //             content: const Text('Wrong password provided for that user.'),
-  //             actions: [
-  //               TextButton(
-  //                   onPressed: () => Navigator.of(context).pop(),
-  //                   child: const Text('Ok'))
-  //             ],
-  //           ));
-  // } else {
-  // User? currentUser = FirebaseAuth.instance.currentUser;
-
-  // final docRef = FirebaseFirestore.instance
-  //     .collection('Users')
-  //     .doc(currentUser!.uid)
-  //     .collection('UserInformation')
-  //     .doc(currentUser.uid);
-  // docRef.get().then(
-  //   (DocumentSnapshot doc) {
-  //     final data = doc.data() as Map<String, dynamic>;
-  //     _user = UserInformation(
-  //         userId: data['userId'],
-  //         email: data['email'],
-  //         username: data['username'],
-  //         profilePicture: data['profilePicture']);
-  //         },
-  //         onError: (e) {
-  //           var snackBar = SnackBar(content: Text(e.toString()));
-  //           ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  //         },
-  //       );
-  //       // saveDataToLocal(_user);
-  //       // markUserSignedIn();
-  //       print('User signed in');
-  //     }
-  //   }
-  // }
 
   void signIn(VoidCallback navigator) async {
     bool isSignInSuccess = false;
@@ -115,6 +39,7 @@ class _SignInState extends State<SignIn> {
             password: _password,
           )
           .then((value) => {
+                // ignore: unnecessary_null_comparison
                 if (value != null)
                   {
                     isSignInSuccess = true,
@@ -166,6 +91,8 @@ class _SignInState extends State<SignIn> {
         setState(() {
           user = UserInformation.fromJson(data);
         });
+        saveDataToLocal(user);
+        markUserSignedIn();
       }, onError: (e) {
         var snackBar = SnackBar(content: Text(e.toString()));
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -200,7 +127,7 @@ class _SignInState extends State<SignIn> {
                           if (value!.isEmpty) {
                             return 'Please enter an email';
                           }
-                          if (!emailValidator(value)) {
+                          if (!AuthClass().emailValidator(value)) {
                             return 'Please enter a valid email';
                           }
                           return null;

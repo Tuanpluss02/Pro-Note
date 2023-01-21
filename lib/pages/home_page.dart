@@ -1,8 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:pro_note/models/note_card.dart';
 import 'package:pro_note/models/user.dart';
 import 'package:pro_note/pages/edit_note.dart';
+import 'package:pro_note/pages/signin_creen.dart';
+import 'package:pro_note/services/auth_method.dart';
 import 'package:pro_note/styles/app_style.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -14,13 +17,14 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  late Stream<QuerySnapshot<Map<String, dynamic>>> snapshots;
+  late Stream<QuerySnapshot<Map<String, dynamic>>> noteStream;
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
     setState(() {
-      snapshots = FirebaseFirestore.instance
+      noteStream = FirebaseFirestore.instance
           .collection('Users')
           .doc(widget.user.userId)
           .collection('UserNotes')
@@ -28,14 +32,87 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  // _changeDisplayPicture() async {
+  //   await AuthClass().changeDisplayPicture(context, widget.user.userId!);
+  // }
+
+  void _changeDisplayName(BuildContext context) async {
+    late String displayName;
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Positioned(
+                  right: -40.0,
+                  top: -40.0,
+                  child: InkResponse(
+                    onTap: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const CircleAvatar(
+                      backgroundColor: Colors.red,
+                      child: Icon(Icons.close),
+                    ),
+                  ),
+                ),
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextFormField(
+                          decoration: const InputDecoration(
+                              hintText: "Enter your new display name"),
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return "Please enter a display name";
+                            }
+                            return null;
+                          },
+                          onSaved: (value) {
+                            displayName = value!;
+                          },
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ElevatedButton(
+                          child: const Text("Change Display Name"),
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              _formKey.currentState!.save();
+                              AuthClass()
+                                  .changeDisplayName(displayName, context);
+                              widget.user.displayName = displayName;
+                            }
+                          },
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
+    var statusBarHeight = MediaQuery.of(context).padding.top;
+    var appBarHeight = kToolbarHeight;
     return Scaffold(
+      primary: true,
       backgroundColor: AppStyle.mainColor,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         leading: Builder(builder: (context) {
           return TextButton(
-            // onPressed: () => Scaffold.of(context).openDrawer(),
             onPressed: () => Scaffold.of(context).openDrawer(),
             child: CircleAvatar(
                 radius: 20,
@@ -54,7 +131,7 @@ class _MyHomePageState extends State<MyHomePage> {
           const SizedBox(height: 20),
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
-              stream: snapshots,
+              stream: noteStream,
               builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
@@ -84,22 +161,82 @@ class _MyHomePageState extends State<MyHomePage> {
           )
         ],
       ),
-      drawer: Drawer(
-          child: Center(
-        child: Column(
-          children: [
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: NetworkImage(widget.user.profilePicture!),
-            ),
-            const SizedBox(height: 20),
-            Text(widget.user.username!),
-            const SizedBox(height: 20),
-            Text(widget.user.email!),
-            const SizedBox(height: 20),
-          ],
-        ),
-      )),
+      drawer: Container(
+        padding: EdgeInsets.only(
+            top: statusBarHeight +
+                appBarHeight +
+                1), //adding one pixel for appbar shadow
+        // width: MediaQuery.of(context).size.width,
+        child: Drawer(
+            child: Center(
+          child: Column(
+            children: [
+              Container(
+                height: MediaQuery.of(context).size.height * 0.25,
+                width: double.infinity,
+                color: AppStyle.mainColor.withOpacity(0.4),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 10),
+                    CircleAvatar(
+                      radius: 50,
+                      backgroundImage:
+                          NetworkImage(widget.user.profilePicture!),
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      widget.user.displayName!,
+                      style: GoogleFonts.roboto(
+                        fontSize: 16,
+                        color: AppStyle.mainColor,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(widget.user.email!),
+                    const SizedBox(height: 20),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
+              ListTile(
+                leading: const Icon(Icons.abc),
+                title: const Text('Change display name'),
+                onTap: () => _changeDisplayName(context),
+              ),
+              const SizedBox(height: 10),
+              ListTile(
+                leading: const Icon(Icons.person),
+                title: const Text('Change email'),
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+              const SizedBox(height: 10),
+              const ListTile(
+                leading: Icon(Icons.key),
+                title: Text('Change password'),
+                // onTap: () {
+                //   Navigator.push(
+                //       context,
+                //       MaterialPageRoute(
+                //           builder: (context) => const ChangePasswordPage()));
+                // }
+              ),
+              const SizedBox(height: 10),
+              ListTile(
+                leading: const Icon(Icons.logout),
+                title: const Text('Sign Out'),
+                onTap: () {
+                  AuthClass().signOut(context);
+                  Navigator.pushReplacement(context,
+                      MaterialPageRoute(builder: (context) => const SignIn()));
+                },
+              )
+            ],
+          ),
+        )),
+      ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           Navigator.push(

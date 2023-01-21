@@ -6,9 +6,9 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pro_note/models/user.dart';
-import 'package:pro_note/models/validator.dart';
 import 'package:pro_note/pages/home_page.dart';
-import 'package:pro_note/services/data_store.dart';
+import 'package:pro_note/services/auth_method.dart';
+import 'package:pro_note/services/data_modify.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
@@ -19,8 +19,8 @@ class SignUp extends StatefulWidget {
 
 class _SignUpState extends State<SignUp> {
   // ignore: prefer_final_fields
-  UserInformation _user =
-      UserInformation(userId: '', email: '', profilePicture: '', username: '');
+  UserInformation _user = UserInformation(
+      userId: '', email: '', profilePicture: '', displayName: '');
   String password = '';
   var isLoading = false;
   File? _image;
@@ -76,7 +76,7 @@ class _SignUpState extends State<SignUp> {
         .doc(userCredential.user!.uid)
         .set({
       'userId': _user.userId,
-      'username': _user.username,
+      'displayName': _user.displayName,
       'email': _user.email,
       'profilePicture': _user.profilePicture,
     });
@@ -112,18 +112,18 @@ class _SignUpState extends State<SignUp> {
                       TextFormField(
                         validator: (value) {
                           if (value != null && value.isEmpty) {
-                            return 'Please enter a username';
+                            return 'Please enter display name';
                           }
                           return null;
                         },
                         onSaved: (p) {
                           setState(() {
-                            _user.username = p!;
+                            _user.displayName = p!;
                           });
                         },
                         autocorrect: false,
                         decoration: InputDecoration(
-                            labelText: 'Username',
+                            labelText: 'Display Name',
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12)),
                             suffixIcon: const Icon(Icons.person)),
@@ -134,7 +134,7 @@ class _SignUpState extends State<SignUp> {
                           if (value!.isEmpty) {
                             return 'Please enter an email';
                           }
-                          if (!emailValidator(value)) {
+                          if (!AuthClass().emailValidator(value)) {
                             return 'Please enter a valid email';
                           }
 
@@ -159,9 +159,9 @@ class _SignUpState extends State<SignUp> {
                           if (value!.isEmpty) {
                             return 'Please enter a password';
                           }
-                          if (!passwordValidator(value)) {
-                            return 'Password must be at least 8 characters, contain at least one uppercase letter, one lowercase letter and one number';
-                          }
+                          // if (!AuthClass().passwordValidator(value)) {
+                          //   return 'Password must be at least 8 characters, contain at least one uppercase letter, one lowercase letter and one number';
+                          // }
                           return null;
                         },
                         onSaved: (val) {

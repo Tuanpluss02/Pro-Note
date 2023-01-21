@@ -5,7 +5,7 @@ Future<void> saveDataToLocal(UserInformation user) async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.setString('userId', user.userId!);
   await prefs.setString('email', user.email!);
-  await prefs.setString('username', user.username!);
+  await prefs.setString('displayName', user.displayName!);
   await prefs.setString('profilePicture', user.profilePicture!);
 }
 
@@ -13,13 +13,13 @@ Future<UserInformation> getLocalData() async {
   final prefs = await SharedPreferences.getInstance();
   final userId = prefs.getString('userId');
   final email = prefs.getString('email');
-  final username = prefs.getString('username');
+  final displayName = prefs.getString('displayName');
   final profilePicture = prefs.getString('profilePicture');
-  return UserInformation(
-      userId: userId!,
-      email: email!,
-      username: username!,
-      profilePicture: profilePicture!);
+  return Future(() => UserInformation(
+      userId: userId,
+      email: email,
+      displayName: displayName,
+      profilePicture: profilePicture));
 }
 
 Future<void> clearLocalData() async {

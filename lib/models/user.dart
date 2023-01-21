@@ -4,13 +4,13 @@ class UserInformation {
   String? _profilePicture;
   String? _userId;
   String? _email;
-  String? _username;
+  String? _displayName;
 
   UserInformation(
       {String? profilePicture,
       String? userId,
       String? email,
-      String? username}) {
+      String? displayName}) {
     if (profilePicture != null) {
       _profilePicture = profilePicture;
     }
@@ -20,8 +20,8 @@ class UserInformation {
     if (email != null) {
       _email = email;
     }
-    if (username != null) {
-      _username = username;
+    if (displayName != null) {
+      _displayName = displayName;
     }
   }
 
@@ -30,20 +30,20 @@ class UserInformation {
   String? get userImage => _profilePicture;
   String? get userId => _userId;
   String? get email => _email;
-  String? get username => _username;
+  String? get displayName => _displayName;
 
   set profilePicture(String? profilePicture) =>
       _profilePicture = profilePicture;
   set userId(String? userId) => _userId = userId;
 
   set email(String? email) => _email = email;
-  set username(String? username) => _username = username;
+  set displayName(String? displayName) => _displayName = displayName;
 
   UserInformation.fromJson(Map<String, dynamic> json) {
     _profilePicture = json['profilePicture'];
     _userId = json['userId'];
     _email = json['email'];
-    _username = json['username'];
+    _displayName = json['displayName'];
   }
 
   Map<String, dynamic> toJson() {
@@ -51,7 +51,7 @@ class UserInformation {
     data['profilePicture'] = _profilePicture;
     data['userId'] = _userId;
     data['email'] = _email;
-    data['username'] = _username;
+    data['displayName'] = _displayName;
     return data;
   }
 }
