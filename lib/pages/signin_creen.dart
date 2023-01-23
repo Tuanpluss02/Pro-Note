@@ -80,6 +80,7 @@ class _SignInState extends State<SignIn> {
     }
     if (isSignInSuccess) {
       User? currentUser = FirebaseAuth.instance.currentUser;
+
       await FirebaseFirestore.instance
           .collection('Users')
           .doc(currentUser!.uid)
@@ -179,7 +180,7 @@ class _SignInState extends State<SignIn> {
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                MyHomePage(user: user)))),
+                                                const MyHomePage()))),
                                 child: const Text('Sign In'),
                               ),
                             ),

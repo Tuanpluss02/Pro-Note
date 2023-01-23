@@ -26,8 +26,6 @@ class UserInformation {
   }
 
   String? get profilePicture => _profilePicture;
-
-  String? get userImage => _profilePicture;
   String? get userId => _userId;
   String? get email => _email;
   String? get displayName => _displayName;
@@ -35,7 +33,6 @@ class UserInformation {
   set profilePicture(String? profilePicture) =>
       _profilePicture = profilePicture;
   set userId(String? userId) => _userId = userId;
-
   set email(String? email) => _email = email;
   set displayName(String? displayName) => _displayName = displayName;
 

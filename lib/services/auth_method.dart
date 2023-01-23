@@ -1,8 +1,13 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:pro_note/models/user.dart';
 import 'package:pro_note/services/data_modify.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -46,6 +51,28 @@ class AuthClass {
     return true;
   }
 
+  changeEmail(String email, BuildContext context) async {
+    final currentUser = FirebaseAuth.instance.currentUser!;
+    try {
+      await currentUser.updateEmail(email);
+      await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(currentUser.uid)
+          .collection('UserInformation')
+          .doc(currentUser.uid)
+          .set({
+        'email': email,
+      }, SetOptions(merge: true));
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('email', email);
+      showSnackBar(context, 'Email changed successfully');
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'email-already-in-use') {
+        showSnackBar(context, 'The account already exists for that email');
+      }
+    }
+  }
+
   changeDisplayName(String displayName, BuildContext context) async {
     final currentUser = await getLocalData();
     try {
@@ -80,6 +107,35 @@ class AuthClass {
     }).catchError((err) {
       showSnackBar(context, err.toString());
     });
+  }
+
+  Future<UserInformation> changeDisplayPicture(
+      BuildContext context, UserInformation user) async {
+    final picker = ImagePicker();
+    try {
+      final image =
+          await picker.pickImage(source: ImageSource.camera, imageQuality: 50);
+      Reference ref = FirebaseStorage.instance.ref().child('user_image');
+      ref.child('${user.userId}.jpg').delete();
+      ref = ref.child('${user.userId}.jpg');
+      UploadTask uploadTask = ref.putFile(File(image!.path));
+      final snapshot = await uploadTask.whenComplete(() => null);
+      user.profilePicture = await snapshot.ref.getDownloadURL();
+      await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(user.userId)
+          .collection('UserInformation')
+          .doc(user.userId)
+          .set({
+        'profilePicture': user.profilePicture,
+      }, SetOptions(merge: true));
+      saveDataToLocal(user);
+      showSnackBar(context, 'Profile picture changed successfully');
+      return user;
+    } catch (e) {
+      showSnackBar(context, e.toString());
+    }
+    return user;
   }
 
   void showSnackBar(BuildContext context, String text) {

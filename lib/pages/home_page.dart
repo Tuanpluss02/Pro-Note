@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pro_note/models/note_card.dart';
@@ -9,8 +10,7 @@ import 'package:pro_note/services/auth_method.dart';
 import 'package:pro_note/styles/app_style.dart';
 
 class MyHomePage extends StatefulWidget {
-  final UserInformation user;
-  const MyHomePage({super.key, required this.user});
+  const MyHomePage({super.key});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -19,25 +19,43 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   late Stream<QuerySnapshot<Map<String, dynamic>>> noteStream;
   final _formKey = GlobalKey<FormState>();
+  var currentUser = FirebaseAuth.instance.currentUser;
+  UserInformation _user = UserInformation();
+
+  Future<void> getData() async {
+    await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(currentUser!.uid)
+        .collection('UserInformation')
+        .doc(currentUser!.uid)
+        .get()
+        .then((DocumentSnapshot doc) {
+      final data = doc.data() as Map<String, dynamic>;
+      setState(() {
+        _user = UserInformation.fromJson(data);
+      });
+    }, onError: (e) {
+      var snackBar = SnackBar(content: Text(e.toString()));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+    getData();
     setState(() {
       noteStream = FirebaseFirestore.instance
           .collection('Users')
-          .doc(widget.user.userId)
+          .doc(currentUser!.uid)
           .collection('UserNotes')
           .snapshots();
     });
   }
 
-  // _changeDisplayPicture() async {
-  //   await AuthClass().changeDisplayPicture(context, widget.user.userId!);
-  // }
-
   void _changeDisplayName(BuildContext context) async {
     late String displayName;
+    void popNavi = Navigator.of(context).pop();
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -88,7 +106,81 @@ class _MyHomePageState extends State<MyHomePage> {
                               _formKey.currentState!.save();
                               AuthClass()
                                   .changeDisplayName(displayName, context);
-                              widget.user.displayName = displayName;
+                              _user.displayName = displayName;
+                            }
+                            popNavi;
+                            popNavi;
+                          },
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
+  }
+
+  void changePicture() async {
+    var user = await AuthClass().changeDisplayPicture(context, _user);
+    setState(() {
+      _user = user;
+    });
+  }
+
+  void changeEmail() {
+    late String email;
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Positioned(
+                  right: -40.0,
+                  top: -40.0,
+                  child: InkResponse(
+                    onTap: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const CircleAvatar(
+                      backgroundColor: Colors.red,
+                      child: Icon(Icons.close),
+                    ),
+                  ),
+                ),
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextFormField(
+                          decoration: const InputDecoration(
+                              hintText: "Enter your new email"),
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return "Please enter a email";
+                            }
+                            return null;
+                          },
+                          onSaved: (value) {
+                            email = value!;
+                          },
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ElevatedButton(
+                          child: const Text("Change Email"),
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              _formKey.currentState!.save();
+                              AuthClass().changeEmail(email, context);
+                              _user.email = email;
                             }
                           },
                         ),
@@ -116,7 +208,10 @@ class _MyHomePageState extends State<MyHomePage> {
             onPressed: () => Scaffold.of(context).openDrawer(),
             child: CircleAvatar(
                 radius: 20,
-                backgroundImage: NetworkImage(widget.user.profilePicture!)),
+                backgroundImage: _user.profilePicture == null
+                    ? const NetworkImage(
+                        'https://firebasestorage.googleapis.com/v0/b/flutter-to-do-application.appspot.com/o/defaultAvatar.jpg?alt=media&token=e1f98d07-d5e9-481c-8873-8aac1b7ee4f0')
+                    : NetworkImage(_user.profilePicture!)),
           );
         }),
         elevation: 0,
@@ -147,12 +242,12 @@ class _MyHomePageState extends State<MyHomePage> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => EditNote(
-                                        userId: widget.user.userId,
+                                        userId: _user.userId,
                                         docs: docs,
                                         isUpdate: true,
                                       ),
                                     ));
-                              }, docs, context, widget.user.userId!))
+                              }, docs, context, _user.userId ?? '131243242343'))
                           .toList());
                 }
                 return const Center(child: Text('No data'));
@@ -180,12 +275,14 @@ class _MyHomePageState extends State<MyHomePage> {
                     const SizedBox(height: 10),
                     CircleAvatar(
                       radius: 50,
-                      backgroundImage:
-                          NetworkImage(widget.user.profilePicture!),
+                      backgroundImage: _user.profilePicture == null
+                          ? const NetworkImage(
+                              'https://firebasestorage.googleapis.com/v0/b/flutter-to-do-application.appspot.com/o/defaultAvatar.jpg?alt=media&token=e1f98d07-d5e9-481c-8873-8aac1b7ee4f0')
+                          : NetworkImage(_user.profilePicture!),
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      widget.user.displayName!,
+                      _user.displayName ?? 'No name',
                       style: GoogleFonts.roboto(
                         fontSize: 16,
                         color: AppStyle.mainColor,
@@ -193,10 +290,16 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    Text(widget.user.email!),
+                    Text(_user.email ?? 'user email'),
                     const SizedBox(height: 20),
                   ],
                 ),
+              ),
+              const SizedBox(height: 10),
+              ListTile(
+                leading: const Icon(Icons.abc),
+                title: const Text('Change picture'),
+                onTap: () => changePicture(),
               ),
               const SizedBox(height: 10),
               ListTile(
@@ -243,7 +346,7 @@ class _MyHomePageState extends State<MyHomePage> {
               context,
               MaterialPageRoute(
                   builder: (context) => EditNote(
-                        userId: widget.user.userId,
+                        userId: _user.userId ?? '12345',
                         isUpdate: false,
                       )));
         },

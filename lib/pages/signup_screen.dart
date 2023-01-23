@@ -208,9 +208,8 @@ class _SignUpState extends State<SignUp> {
                                   Navigator.pushAndRemoveUntil(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) => MyHomePage(
-                                                user: _user,
-                                              )),
+                                          builder: (context) =>
+                                              const MyHomePage()),
                                       (route) => false);
                                 }),
                                 child: const Text('Sign Up'),
