@@ -107,17 +107,6 @@ class AuthClass {
         showSnackBar(context, 'Failed to change password');
       }
     }
-    // final cred = EmailAuthProvider.credential(
-    //     email: user.email!, password: currentPassword);
-    // user.reauthenticateWithCredential(cred).then((value) {
-    //   user.updatePassword(newPassword).then((_) {
-    //     showSnackBar(context, 'Password changed successfully');
-    //   }).catchError((error) {
-    //     showSnackBar(context, 'Failed to change password');
-    //   });
-    // }).catchError((err) {
-    //   showSnackBar(context, err.toString());
-    // });
   }
 
   Future<UserInformation> changeDisplayPicture(
