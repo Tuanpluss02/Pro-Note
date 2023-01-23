@@ -5,7 +5,7 @@ import 'package:pro_note/models/user.dart';
 import 'package:pro_note/pages/home_page.dart';
 import 'package:pro_note/pages/signup_screen.dart';
 import 'package:pro_note/services/auth_method.dart';
-import 'package:pro_note/services/data_modify.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignIn extends StatefulWidget {
   const SignIn({super.key});
@@ -18,10 +18,12 @@ class _SignInState extends State<SignIn> {
   late UserInformation user;
   late String _email;
   late String _password;
+
   final _formKey = GlobalKey<FormState>();
   var isLoading = false;
 
   void signIn(VoidCallback navigator) async {
+    final prefs = await SharedPreferences.getInstance();
     bool isSignInSuccess = false;
     final isValid = _formKey.currentState!.validate();
     if (!isValid) {
@@ -92,8 +94,9 @@ class _SignInState extends State<SignIn> {
         setState(() {
           user = UserInformation.fromJson(data);
         });
-        saveDataToLocal(user);
-        markUserSignedIn();
+        prefs.setBool('SignedIn', true);
+        //saveDataToLocal(user);
+        // markUserSignedIn();
       }, onError: (e) {
         var snackBar = SnackBar(content: Text(e.toString()));
         ScaffoldMessenger.of(context).showSnackBar(snackBar);

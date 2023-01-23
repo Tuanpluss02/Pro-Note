@@ -8,7 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:pro_note/models/user.dart';
 import 'package:pro_note/pages/home_page.dart';
 import 'package:pro_note/services/auth_method.dart';
-import 'package:pro_note/services/data_modify.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
@@ -22,6 +22,7 @@ class _SignUpState extends State<SignUp> {
   UserInformation _user = UserInformation(
       userId: '', email: '', profilePicture: '', displayName: '');
   String password = '';
+  final String _confirmPassword = '';
   var isLoading = false;
   File? _image;
   final _formKey = GlobalKey<FormState>();
@@ -45,13 +46,15 @@ class _SignUpState extends State<SignUp> {
     if (_image == null) {
       return;
     }
-
+    if (password != _confirmPassword) {
+      return;
+    }
     _formKey.currentState!.save();
 
     setState(() {
       isLoading = true;
     });
-
+    final prefs = await SharedPreferences.getInstance();
     UserCredential userCredential =
         await FirebaseAuth.instance.createUserWithEmailAndPassword(
       email: _user.email!,
@@ -80,13 +83,16 @@ class _SignUpState extends State<SignUp> {
       'email': _user.email,
       'profilePicture': _user.profilePicture,
     });
-    await saveDataToLocal(_user);
-    await markUserSignedIn();
+    prefs.setBool('SignedIn', true);
+    // await saveDataToLocal(_user);
+    // await markUserSignedIn();
     onSuccess.call();
   }
 
   @override
   Widget build(BuildContext context) {
+    final TextEditingController pass = TextEditingController();
+    final TextEditingController confirmPass = TextEditingController();
     return Scaffold(
       body: Center(
           child: Card(
@@ -154,14 +160,15 @@ class _SignUpState extends State<SignUp> {
                       ),
                       const SizedBox(height: 10),
                       TextFormField(
+                        controller: pass,
                         obscureText: true,
                         validator: (value) {
                           if (value!.isEmpty) {
                             return 'Please enter a password';
                           }
-                          // if (!AuthClass().passwordValidator(value)) {
-                          //   return 'Password must be at least 8 characters, contain at least one uppercase letter, one lowercase letter and one number';
-                          // }
+                          if (AuthClass().passwordValidator(value)) {
+                            return 'Password must be at least 6 characters, at least one letter and one number';
+                          }
                           return null;
                         },
                         onSaved: (val) {
@@ -177,24 +184,25 @@ class _SignUpState extends State<SignUp> {
                                 borderRadius: BorderRadius.circular(12))),
                       ),
                       const SizedBox(height: 10),
-                      // TextFormField(
-                      //   obscureText: true,
-                      //   validator: (value) {
-                      //     if (value!.isEmpty) {
-                      //       return 'Please re-enter your password';
-                      //     }
-                      //     if (value != _user.password) {
-                      //       return 'Passwords do not match';
-                      //     }
-                      //     return null;
-                      //   },
-                      //   autocorrect: false,
-                      //   decoration: InputDecoration(
-                      //       labelText: 'Re-enter Password',
-                      //       suffixIcon: const Icon(Icons.lock),
-                      //       border: OutlineInputBorder(
-                      //           borderRadius: BorderRadius.circular(12))),
-                      // ),
+                      TextFormField(
+                        controller: confirmPass,
+                        obscureText: true,
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'Please re-enter your password';
+                          }
+                          if (value != pass.text) {
+                            return 'Passwords do not match';
+                          }
+                          return null;
+                        },
+                        autocorrect: false,
+                        decoration: InputDecoration(
+                            labelText: 'Re-enter Password',
+                            suffixIcon: const Icon(Icons.lock),
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12))),
+                      ),
                       const SizedBox(height: 20),
                       isLoading
                           ? const CircularProgressIndicator()

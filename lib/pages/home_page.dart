@@ -301,7 +301,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               const SizedBox(height: 10),
               ListTile(
-                leading: const Icon(Icons.abc),
+                leading: const Icon(Icons.image),
                 title: const Text('Change picture'),
                 onTap: () => changePicture(),
               ),

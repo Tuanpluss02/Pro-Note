@@ -33,7 +33,7 @@ class AuthClass {
   }
 
   bool passwordValidator(String password) {
-    RegExp exp = RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$');
+    RegExp exp = RegExp(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$');
     return exp.hasMatch(password);
   }
 
@@ -74,18 +74,18 @@ class AuthClass {
   }
 
   changeDisplayName(String displayName, BuildContext context) async {
-    final currentUser = await getLocalData();
+    final currentUser = FirebaseAuth.instance.currentUser!;
     try {
       await FirebaseFirestore.instance
           .collection('Users')
-          .doc(currentUser.userId)
+          .doc(currentUser.uid)
           .collection('UserInformation')
-          .doc(currentUser.userId)
+          .doc(currentUser.uid)
           .set({
         'displayName': displayName,
       }, SetOptions(merge: true)).then((p) {
-        currentUser.displayName = displayName;
-        saveDataToLocal(currentUser);
+        // currentUser.displayName = displayName;
+        // saveDataToLocal(currentUser);
       });
     } on FirebaseAuthException {
       showSnackBar(context, 'Failed to change display name');
