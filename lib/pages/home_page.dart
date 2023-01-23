@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:pro_note/models/note_card.dart';
+import 'package:pro_note/widgets/note_card.dart';
 import 'package:pro_note/models/user.dart';
 import 'package:pro_note/pages/change_password.dart';
 import 'package:pro_note/pages/edit_note.dart';
