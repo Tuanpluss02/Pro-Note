@@ -96,17 +96,28 @@ class AuthClass {
   Future<void> changePassword(
       String newPassword, String currentPassword, BuildContext context) async {
     final user = FirebaseAuth.instance.currentUser!;
-    final cred = EmailAuthProvider.credential(
-        email: user.email!, password: currentPassword);
-    user.reauthenticateWithCredential(cred).then((value) {
-      user.updatePassword(newPassword).then((_) {
-        showSnackBar(context, 'Password changed successfully');
-      }).catchError((error) {
+    try {
+      final cred = EmailAuthProvider.credential(
+          email: user.email!, password: currentPassword);
+      await user.reauthenticateWithCredential(cred);
+      await user.updatePassword(newPassword);
+      showSnackBar(context, 'Password changed successfully');
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'wrong-password') {
         showSnackBar(context, 'Failed to change password');
-      });
-    }).catchError((err) {
-      showSnackBar(context, err.toString());
-    });
+      }
+    }
+    // final cred = EmailAuthProvider.credential(
+    //     email: user.email!, password: currentPassword);
+    // user.reauthenticateWithCredential(cred).then((value) {
+    //   user.updatePassword(newPassword).then((_) {
+    //     showSnackBar(context, 'Password changed successfully');
+    //   }).catchError((error) {
+    //     showSnackBar(context, 'Failed to change password');
+    //   });
+    // }).catchError((err) {
+    //   showSnackBar(context, err.toString());
+    // });
   }
 
   Future<UserInformation> changeDisplayPicture(

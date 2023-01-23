@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pro_note/models/note_card.dart';
 import 'package:pro_note/models/user.dart';
+import 'package:pro_note/pages/change_password.dart';
 import 'package:pro_note/pages/edit_note.dart';
 import 'package:pro_note/pages/signin_creen.dart';
 import 'package:pro_note/services/auth_method.dart';
@@ -21,6 +22,9 @@ class _MyHomePageState extends State<MyHomePage> {
   final _formKey = GlobalKey<FormState>();
   var currentUser = FirebaseAuth.instance.currentUser;
   UserInformation _user = UserInformation();
+  void popNavi() {
+    Navigator.of(context).pop();
+  }
 
   Future<void> getData() async {
     await FirebaseFirestore.instance
@@ -55,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _changeDisplayName(BuildContext context) async {
     late String displayName;
-    void popNavi = Navigator.of(context).pop();
+
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -108,8 +112,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                   .changeDisplayName(displayName, context);
                               _user.displayName = displayName;
                             }
-                            popNavi;
-                            popNavi;
+                            popNavi();
+                            // popNavi;
                           },
                         ),
                       )
@@ -311,20 +315,17 @@ class _MyHomePageState extends State<MyHomePage> {
               ListTile(
                 leading: const Icon(Icons.person),
                 title: const Text('Change email'),
-                onTap: () {
-                  Navigator.pop(context);
-                },
+                onTap: () => changeEmail(),
               ),
               const SizedBox(height: 10),
-              const ListTile(
-                leading: Icon(Icons.key),
-                title: Text('Change password'),
-                // onTap: () {
-                //   Navigator.push(
-                //       context,
-                //       MaterialPageRoute(
-                //           builder: (context) => const ChangePasswordPage()));
-                // }
+              ListTile(
+                leading: const Icon(Icons.key),
+                title: const Text('Change password'),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const ChangePasswordPage()),
+                ),
               ),
               const SizedBox(height: 10),
               ListTile(
