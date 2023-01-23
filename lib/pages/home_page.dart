@@ -288,7 +288,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     Text(
                       _user.displayName ?? 'No name',
                       style: GoogleFonts.roboto(
-                        fontSize: 16,
+                        fontSize: 22,
                         color: AppStyle.mainColor,
                         fontStyle: FontStyle.italic,
                       ),

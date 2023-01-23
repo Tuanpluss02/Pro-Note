@@ -15,14 +15,6 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   final _formKey = GlobalKey<FormState>();
   var _oldPassword;
   var _newPassword;
-  var _reNewPassword;
-
-  bool comparePassword() {
-    if (_reNewPassword != _newPassword) {
-      return false;
-    }
-    return true;
-  }
 
   Future<void> _changePassword() async {
     final isValid = _formKey.currentState!.validate();
@@ -30,14 +22,13 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
       return;
     }
     _formKey.currentState!.save();
-    if (!comparePassword()) {
-      return;
-    }
     await AuthClass().changePassword(_oldPassword, _newPassword, context);
   }
 
   @override
   Widget build(BuildContext context) {
+    final TextEditingController pass = TextEditingController();
+    final TextEditingController confirmPass = TextEditingController();
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -89,6 +80,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                       ),
                       const SizedBox(height: 10),
                       TextFormField(
+                        controller: pass,
                         obscureText: true,
                         validator: (value) {
                           if (value != null && value.isEmpty) {
@@ -113,6 +105,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                       ),
                       const SizedBox(height: 20),
                       TextFormField(
+                        controller: confirmPass,
                         obscureText: true,
                         validator: (value) {
                           if (value != null && value.isEmpty) {
@@ -121,15 +114,10 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                           // if (!passwordValidator(value)) {
                           //   return 'Password must be at least 8 characters, contain at least one uppercase letter, one lowercase letter and one number';
                           // }
-                          if (!comparePassword()) {
-                            return 'Password does not match';
+                          if (value != pass.text) {
+                            return 'Passwords do not match';
                           }
                           return null;
-                        },
-                        onSaved: (newValue) {
-                          setState(() {
-                            _reNewPassword = newValue!;
-                          });
                         },
                         autocorrect: false,
                         decoration: InputDecoration(

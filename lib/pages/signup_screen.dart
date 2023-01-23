@@ -43,9 +43,7 @@ class _SignUpState extends State<SignUp> {
     if (!isValid) {
       return;
     }
-    if (_image == null) {
-      return;
-    }
+    _image ??= File('\\assets\\defaultAvatar.jpg');
     if (password != _confirmPassword) {
       return;
     }
