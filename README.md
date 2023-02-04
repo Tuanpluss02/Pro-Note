@@ -10,6 +10,11 @@ The ultimate cross-platform note-taking application built with Flutter framework
 - Organize notes into categories for better organization
 - A simple and clean interface that is easy on the eyes
 
+## Tech Stack
+- Flutter
+- Dart
+- Firebase(for database)
+
 ## Screenshots
 
 ### Sign up screen
