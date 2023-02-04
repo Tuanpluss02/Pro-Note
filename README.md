@@ -13,7 +13,7 @@ The ultimate cross-platform note-taking application built with Flutter framework
 ## Tech Stack
 - Flutter
 - Dart
-- Firebase(for database)
+- Firebase (for database)
 
 ## Screenshots
 
