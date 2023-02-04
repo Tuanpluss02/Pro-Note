@@ -35,18 +35,19 @@ The ultimate cross-platform note-taking application built with Flutter framework
 ## Getting Started 🚀
 
 To run Pro Notes on your local machine, follow these simple steps:
-
+```
 1. Clone the repository:
-`$ git clone https://github.com/Tuanpluss02/Pro-Note.git` 
+> git clone https://github.com/Tuanpluss02/Pro-Note.git
 
 2. Change into the project directory:
-`$ cd Pro-Note`
+> cd Pro-Note
 
 3. Install dependencies:
-`$ flutter pub get`
+> flutter pub get
 
-4. Run the app:
-`$ flutter run`
+4. Run the app
+> flutter run 
+```
 
 ## Contribution 🤝
 
