@@ -48,11 +48,3 @@ To run Pro Notes on your local machine, follow these simple steps:
 4. Run the app
 > flutter run 
 ```
-
-## Contribution 🤝
-
-We welcome contributions to Pro Notes. To contribute, simply fork the repository and make a pull request with your changes.
-
-## License 📜
-
-Pro Notes is released under the [MIT License](https://opensource.org/licenses/MIT).
