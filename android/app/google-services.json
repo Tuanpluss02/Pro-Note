@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "442694427257",
+    "project_id": "note-me-8da5c",
+    "storage_bucket": "note-me-8da5c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:442694427257:android:901e9bcb90749d16c02aa8",
+        "android_client_info": {
+          "package_name": "com.stormx.note_me"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrfOBI43eNSmxOB4S16kdnJKs0iTV822g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
