@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:note_me/src/features/authentication/domain/auth_service.dart';
+import 'package:note_me/src/routing/app_route.dart';
 
 class SignupController extends GetxController {
   final GlobalKey<FormState> formKey = GlobalKey();
@@ -25,7 +26,7 @@ class SignupController extends GetxController {
         final password = controllerPassword.text;
         final user =
             await authService.createAccount(email: email, password: password);
-        Get.offAllNamed('/home', arguments: {"user": user});
+        Get.offAllNamed(Routes.HOME, arguments: {"user": user});
       }
     } catch (e) {
       Get.dialog(SimpleDialog(

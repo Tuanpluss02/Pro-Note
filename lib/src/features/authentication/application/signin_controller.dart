@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:note_me/src/features/authentication/domain/auth_service.dart';
 
+import '../../../routing/app_route.dart';
+
 class SigninScreenController extends GetxController {
   final GlobalKey<FormState> formKey = GlobalKey();
   final FocusNode focusNodePassword = FocusNode();
@@ -21,7 +23,7 @@ class SigninScreenController extends GetxController {
         final email = controllerUsername.text;
         final password = controllerPassword.text;
         final user = await authService.signIn(email: email, password: password);
-        Get.offAllNamed('/home', arguments: {"user": user});
+        Get.offAllNamed(Routes.HOME, arguments: {"user": user});
       }
     } catch (e) {
       Get.dialog(SimpleDialog(
