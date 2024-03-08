@@ -8,7 +8,8 @@ class UserInformation {
     required this.uid,
     required this.email,
     required this.displayName,
-    required this.profilePicture,
+    this.profilePicture =
+        'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50?s=200',
   });
 
   factory UserInformation.fromJson(Map<String, dynamic> json) {

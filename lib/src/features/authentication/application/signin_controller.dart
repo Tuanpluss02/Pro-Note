@@ -16,19 +16,27 @@ class SigninScreenController extends GetxController {
 
   Future<void> submit() async {
     Get.snackbar("INFO", "Signing you in...", showProgressIndicator: true);
-    if (formKey.currentState!.validate()) {
-      final email = controllerUsername.text;
-      final password = controllerPassword.text;
-      final data = await authService.signIn(email: email, password: password);
-      if (data is String) {
-        Get.dialog(SimpleDialog(
-          title: const Text('Error'),
-          contentPadding: const EdgeInsets.all(20),
-          children: [Text(data)],
-        ));
-      } else {
-        Get.offAllNamed('/home');
+    try {
+      if (formKey.currentState!.validate()) {
+        final email = controllerUsername.text;
+        final password = controllerPassword.text;
+        final user = await authService.signIn(email: email, password: password);
+        Get.offAllNamed('/home', arguments: {"user": user});
       }
+    } catch (e) {
+      Get.dialog(SimpleDialog(
+        title: const Text('Error'),
+        contentPadding: const EdgeInsets.all(20),
+        children: [Text(e.toString())],
+      ));
     }
+  }
+
+  @override
+  void onClose() {
+    controllerUsername.dispose();
+    controllerPassword.dispose();
+    focusNodePassword.dispose();
+    super.onClose();
   }
 }
